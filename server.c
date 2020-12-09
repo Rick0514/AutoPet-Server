@@ -90,9 +90,9 @@ void recCallback(){
     char res[readPtr+1];
     for(int i=0; i<readPtr; i++)    res[i] = readBuff[i];
     res[readPtr] = '\0';
-    printf("client: %s\n", res);
+    //printf("client: %s\n", res);
     if((strcmp(res, "mcu") == 0) && (myClients.mcu_sockfd == -1)){
-        printf("mcu is connected\n");
+        //printf("mcu is connected\n");
         mcu_alive = 1;
         heartbeat = 0;
         myClients.mcu_sockfd = client_sockfd;
@@ -102,14 +102,14 @@ void recCallback(){
         createThread(&mcuHeartbeatThread, &mcuHTHattr, mcu_heartbeats);
 
     }else if((strcmp(res, "and")==0) && (myClients.and_sockfd == -1)){
-        printf("and is connected\n");
+        //printf("and is connected\n");
         myClients.and_sockfd = client_sockfd;
         setThreadAttr(&andRTHattr, 50);
         setThreadAttr(&andTHTattr, 60);
         createThread(&andRecThread, &andRTHattr, rec_from_and);
         createThread(&andRecThread, &andTHTattr, and_heartbeats);
     }else{
-        printf("wrong client!!\n");
+        //printf("wrong client!!\n");
         close(client_sockfd);
         sem_post(&signal);
     }
@@ -157,14 +157,14 @@ void waitForClients(){
         sem_wait(&signal);
         /*监听连接请求--监听队列长度为5*/
         sin_size=sizeof(struct sockaddr_in);
-        printf("wait for clients...\n");
+        //printf("wait for clients...\n");
         if((client_sockfd=accept(server_sockfd,
             (struct sockaddr *)&remote_addr,&sin_size))<0){
                 perror("accept error");
                 sem_post(&signal);
                 continue;
             }
-        printf("check client's id\n");
+        //printf("check client's id\n");
         not_get_id = 1;
         while(not_get_id){
             int len = recv(client_sockfd,rbuf,RSBUF_SIZE,0);
@@ -195,7 +195,7 @@ void *and_heartbeats(){
         and_alive--;
         pthread_mutex_unlock(&and_lock);
     }
-    printf("and tcp breaking\n");
+    //printf("and tcp breaking\n");
     close(myClients.and_sockfd);
     sem_post(&signal);
     myClients.and_sockfd = -1;
@@ -214,7 +214,7 @@ void* mcu_heartbeats()
         pthread_mutex_unlock(&mcu_lock);
         sleep(1);
     }
-    printf("mcu tcp breaking\n");
+    //printf("mcu tcp breaking\n");
     close(myClients.mcu_sockfd);
     sem_post(&signal);
     myClients.mcu_sockfd = -1;
@@ -239,13 +239,13 @@ void* rec_from_mcu()
                 pthread_mutex_unlock(&mcu_lock);
                 continue;
             }
-            // printf rbuf to be sent to and
+            // //printf rbuf to be sent to and
             rbuf[len]='\0';
-            printf("%s\n",rbuf);
+            //printf("%s\n",rbuf);
 
             rbuf[len] = '\n';
             if(send(myClients.and_sockfd, rbuf, len+1, 0) <= 0){
-                printf("failed to send to and, check for and's tcp\n");
+                //printf("failed to send to and, check for and's tcp\n");
             }
         }else if((len <=0) && (errno == EINTR)){
 
@@ -267,12 +267,12 @@ void analyseDataForMcu(char* rbuf, int len){
             if((readPtr > 0) && (rec_flag ==1)){
                 if((readBuff[0] == 'f') && (readBuff[1] == 'd')){
                     char cmd[] = "fd";
-                    printf("and: fd\n");
+                    //printf("and: fd\n");
                     send(myClients.mcu_sockfd, cmd, sizeof(cmd), 0);
                 }
                 if((readBuff[0] == 'w') && (readBuff[1] == 's')){
                     char cmd[] = "ws";
-                    printf("and: ws\n");
+                    //printf("and: ws\n");
                     // temp += 0.2;    tum += 0.2;
                     // char echo[16] = {0};
                     // sprintf(echo, "w%.1f\ns%.1f\n", temp, tum);
@@ -365,19 +365,19 @@ int main(int argc, char *argv[])
 
     int ret = pthread_mutex_init(&mcu_lock, NULL);
     if (ret != 0) {
-        printf("mutex init failed\n");
+        //printf("mutex init failed\n");
         return -1;
     }
 
     ret = pthread_mutex_init(&and_lock, NULL);
     if (ret != 0) {
-        printf("mutex init failed\n");
+        //printf("mutex init failed\n");
         return -1;
     }
 
     ret = sem_init(&signal, 2, 2);
     if (ret != 0) {
-        printf("sem init failed\n");
+        //printf("sem init failed\n");
         return -1;
     }
 
