@@ -103,6 +103,7 @@ void recCallback(){
 
     }else if((strcmp(res, "and")==0) && (myClients.and_sockfd == -1)){
         //printf("and is connected\n");
+        and_alive = 2;
         myClients.and_sockfd = client_sockfd;
         setThreadAttr(&andRTHattr, 50);
         setThreadAttr(&andTHTattr, 60);
@@ -176,7 +177,7 @@ void waitForClients(){
                 perror("network error2");
                 close(client_sockfd);
                 sem_post(&signal);
-                break;
+                not_get_id = 0;
             }   
         }
     }
@@ -199,7 +200,6 @@ void *and_heartbeats(){
     close(myClients.and_sockfd);
     sem_post(&signal);
     myClients.and_sockfd = -1;
-    and_alive = 2;
 }
 
 void* mcu_heartbeats()
@@ -317,7 +317,6 @@ void *rec_from_and(){
 
     close(myClients.and_sockfd);
     myClients.and_sockfd = -1;
-    and_alive = 2;
 }
 
 
