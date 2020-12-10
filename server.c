@@ -68,7 +68,7 @@ void *mcu_heartbeats();
 void *and_heartbeats();
 int analyseData(char* rbuf, int len);
 void analyseDataForMcu(char* rbuf, int len);
-void snd_to_mcu();
+
 
 
 void setThreadAttr(pthread_attr_t *attr, int pro){
@@ -100,7 +100,7 @@ void recCallback(){
         setThreadAttr(&mcuHTHattr, 60);
         createThread(&mcuRecThread, &mcuRTHattr, rec_from_mcu);
         createThread(&mcuHeartbeatThread, &mcuHTHattr, mcu_heartbeats);
-
+        if(and_alive)   send(myClients.and_sockfd, "mcu\n", 4, 0);
     }else if((strcmp(res, "and")==0) && (myClients.and_sockfd == -1)){
         //printf("and is connected\n");
         and_alive = 2;
@@ -109,6 +109,7 @@ void recCallback(){
         setThreadAttr(&andTHTattr, 60);
         createThread(&andRecThread, &andRTHattr, rec_from_and);
         createThread(&andRecThread, &andTHTattr, and_heartbeats);
+        if(mcu_alive)   send(myClients.and_sockfd, "mcu\n", 4, 0);
     }else{
         //printf("wrong client!!\n");
         close(client_sockfd);
@@ -220,6 +221,7 @@ void* mcu_heartbeats()
     myClients.mcu_sockfd = -1;
     mcu_alive = 0;
     heartbeat = 0;
+    if(and_alive)   send(myClients.and_sockfd, "dmcu\n", 5, 0);
 }
 
 void* rec_from_mcu()
