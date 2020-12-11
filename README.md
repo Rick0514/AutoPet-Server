@@ -31,7 +31,7 @@ $ sh run.sh ./server server.log
 
 ## Code Structure
 
-![img](./img/code_structure.jpg)
+<center><img src="./img/code_structure.jpg" width=300></center>
 
 
 * 初始化Socket
@@ -55,4 +55,3 @@ bind();     // 绑定到端口
     * 接收安卓端控制信号后，发送到MCU客户。
     * 接收MCU发送的温湿度信息，发送到安卓客户。
 
-    
