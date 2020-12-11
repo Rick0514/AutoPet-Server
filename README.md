@@ -31,7 +31,7 @@ $ sh run.sh ./server server.log
 
 ## Code Structure
 
-<center><img src="./img/code_structure.jpg" width=300></center>
+<center><img src="./img/code_structure.jpg" width=500></center>
 
 
 * 初始化Socket
